@@ -518,7 +518,7 @@ export class EventHandler {
 
 }
 
-export function listen_to(variable, action) {
+export function listen_to(variable, action, immediate = false) {
     if (!Array.isArray(action)) action = [action]
     if (typeof variable != 'function') {
         const variable_uni = variable
@@ -537,4 +537,7 @@ export function listen_to(variable, action) {
             return clearInterval(int)
         }
     }, 10)
+    if (immediate) {
+        action.forEach(f => f())
+    }
 }

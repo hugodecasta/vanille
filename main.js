@@ -17,14 +17,14 @@ function mon_composant_de_dingue() {
     let count = count_db.object.count
 
     const counter_shower = div()
-    counter_shower.set_updater(() => {
+
+    function update() {
         counter_shower.clear()
         counter_shower.innerHTML = 'Count = ' + count
+        count_db.object.count = count
+    }
 
-    })
-
-    listen_to(() => count, counter_shower.update)
-    listen_to(() => count, () => count_db.object.count = count)
+    listen_to(() => count, update, true)
 
     const controler = div('',
         button('+', () => count += 1),
