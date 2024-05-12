@@ -136,6 +136,24 @@ export function div(classes, ...content) {
     return create_elm('div', classes, ...content)
 }
 
+export function divabs(...content) {
+    const d = div('', ...content)
+    d.set_style({ position: 'absolute', top: '0px', left: '0px' })
+    return d
+}
+
+export function divfix(...content) {
+    const d = div('', ...content)
+    d.set_style({ position: 'fixed', top: '0px', left: '0px' })
+    return d
+}
+
+export function divrel(...content) {
+    const d = div('', ...content)
+    d.set_style({ position: 'relative' })
+    return d
+}
+
 export function svg_elm(tag = 'svg', attrs = {}) {
     const elm = document.createElementNS('http://www.w3.org/2000/svg', tag)
     decorate_with_setters(elm)
