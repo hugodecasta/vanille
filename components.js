@@ -305,6 +305,11 @@ export function input(holder = '', type = 'text', cb = () => { }) {
         change_function_name = 'onblur'
     }
     input[change_function_name] = () => cb(is_checkbox ? input.checked : input.value)
+    const old_focus = input.focus
+    input.focus = () => {
+        setTimeout(() => old_focus.call(input), 10)
+        return input
+    }
     return input
 }
 
