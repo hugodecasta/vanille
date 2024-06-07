@@ -295,21 +295,40 @@ export function multi_selecter(list, pre_selected = [], cb) {
     return lister
 }
 
+function replace_old_func(elm, func_name, func) {
+    const old_func = elm[func_name]
+    elm[func_name] = () => {
+        const caller = () => old_func.call(elm)
+        func(caller)
+        return elm
+    }
+}
+
 export function input(holder = '', type = 'text', cb = () => { }) {
     const is_checkbox = type.toLocaleLowerCase() == 'checkbox'
     const input = type.toLocaleLowerCase() == 'textarea' ? create_elm('textarea') : create_elm('input')
     input.setAttribute('type', type)
     input[is_checkbox ? 'checked' : 'value'] = holder
+
     let change_function_name = 'onchange'
     if (type.toLocaleLowerCase() == 'date') {
         change_function_name = 'onblur'
     }
     input[change_function_name] = () => cb(is_checkbox ? input.checked : input.value)
-    const old_focus = input.focus
-    input.focus = () => {
-        setTimeout(() => old_focus.call(input), 10)
-        return input
+    input['onblur'] = () => cb(is_checkbox ? input.checked : input.value)
+
+    input.onkeyup = (evt) => {
+        if (evt.key == 'Enter') cb(is_checkbox ? input.checked : input.value)
     }
+
+    replace_old_func(input, 'focus', (caller) => {
+        setTimeout(caller, 10)
+    })
+
+    replace_old_func(input, 'select', (caller) => {
+        setTimeout(caller, 10)
+    })
+
     return input
 }
 
