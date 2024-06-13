@@ -304,7 +304,7 @@ function replace_old_func(elm, func_name, func) {
     }
 }
 
-export function input(holder = '', type = 'text', cb = () => { }) {
+export function input(holder = '', type = 'text', cb = () => { }, use_enter_key = true) {
     const is_checkbox = type.toLocaleLowerCase() == 'checkbox'
     const input = type.toLocaleLowerCase() == 'textarea' ? create_elm('textarea') : create_elm('input')
     input.setAttribute('type', type)
@@ -318,7 +318,7 @@ export function input(holder = '', type = 'text', cb = () => { }) {
     input['onblur'] = () => cb(is_checkbox ? input.checked : input.value)
 
     input.onkeyup = (evt) => {
-        if (evt.key == 'Enter') cb(is_checkbox ? input.checked : input.value)
+        if (evt.key == 'Enter' && use_enter_key) cb(is_checkbox ? input.checked : input.value)
     }
 
     replace_old_func(input, 'focus', (caller) => {
@@ -476,18 +476,19 @@ export function make_moveable(elm, mover_elm, init_position = null, offset_posit
 
     function mouse_move(evt) {
         if (coord_differ) {
-            let x = evt.clientX + coord_differ.x
-            let y = evt.clientY + coord_differ.y
+            let offset = { x: 0, y: 0, scale: 1 }
             if (offset_position) {
-                let offset = offset_position
+                offset = offset_position
                 if (typeof offset_position == 'function')
                     offset = offset_position()
-                x -= offset.x
-                y -= offset.y
             }
+            let x = evt.clientX + coord_differ.x
+            let y = evt.clientY + coord_differ.y
+            x -= offset.x
+            y -= offset.y
             elm.set_style({
-                left: x + 'px',
-                top: y + 'px'
+                left: x * (1 / offset.scale) + 'px',
+                top: y * (1 / offset.scale) + 'px'
             })
             if (elm.onmove) {
                 elm.onmove(x, y, coord_start)
@@ -582,4 +583,50 @@ export function listen_to(variable, action, immediate = false) {
     if (immediate) {
         action.forEach(f => f())
     }
+}
+
+export async function popup_pop(inside_div, end_action) {
+    return new Promise((ok) => {
+
+        const back = divfix().add2b().set_style({
+            top: '0px', left: '0px',
+            width: '100%',
+            height: '100%',
+            background: '#000',
+            opacity: 0.5,
+            zIndex: 1000000000
+        })
+        const popup = divfix().add2b().add(inside_div).set_style({
+            top: '50%', left: '50%',
+            maxWidth: '500px',
+            background: '#fff',
+            padding: '10px',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 10000000000
+        })
+
+        function end(data) {
+            back.remove()
+            popup.remove()
+            ok(data)
+        }
+
+        popup.add(
+            hr(),
+            button('OK', () => end(end_action())),
+            button('Cancel', () => end(null)),
+        )
+
+    })
+
+}
+
+export function dynadiv(variable_func, draw_func) {
+    const dyv = div()
+    dyv.set_updater(() => {
+        dyv.clear()
+        draw_func.call(dyv, variable_func())
+    })
+    listen_to(variable_func, dyv.update, true)
+    return dyv
 }
