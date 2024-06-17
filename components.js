@@ -585,7 +585,7 @@ export function listen_to(variable, action, immediate = false) {
     }
 }
 
-export async function popup_pop(inside_div, end_action) {
+export async function popup_pop(inside_div, end_action, button_func_maker) {
     return new Promise((ok) => {
 
         const back = divfix().add2b().set_style({
@@ -613,9 +613,16 @@ export async function popup_pop(inside_div, end_action) {
 
         popup.add(
             hr(),
-            button('OK', () => end(end_action())),
-            button('Cancel', () => end(null)),
         )
+        if (button_func_maker) {
+            const end_buttons = button_func_maker(end)
+            popup.add(end_buttons)
+        }
+        else {
+            popup.add(
+                button('OK', () => end(end_action())),
+                button('Cancel', () => end(null)),)
+        }
 
     })
 
