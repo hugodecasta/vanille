@@ -637,3 +637,10 @@ export function dynadiv(variable_func, draw_func) {
     listen_to(variable_func, dyv.update, true)
     return dyv
 }
+
+export function from_table(array) {
+    return create_elm('table').add(
+        ...array.map(line => create_elm('tr').add(...line.map(elm => create_elm('td', '', elm))))
+    )
+
+}
