@@ -136,6 +136,10 @@ export function div(classes, ...content) {
     return create_elm('div', classes, ...content)
 }
 
+export function alink(href, target = '', ...content) {
+    return create_elm('a', '', ...content).set_attributes({ href, target })
+}
+
 export function divabs(...content) {
     const d = div('', ...content)
     d.set_style({ position: 'absolute', top: '0px', left: '0px' })
