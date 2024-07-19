@@ -1,5 +1,6 @@
 export function add_to_elm(source, ...content) {
     for (let e of content) {
+        if (e == null) continue
         source.components?.push(e)
         if (e.comp_parent) e.comp_parent = source
         if (typeof (e) == 'number') {
