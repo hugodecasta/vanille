@@ -24,7 +24,7 @@ export function bodyAdd(...content) {
 // ---------------------------------------------- BASE
 
 export function decorate_with_setters(elm) {
-    elm.addClasse = (name) => {
+    elm.add_classe = (name) => {
         name.split(' ').forEach(c => elm.classList.add(c))
         return elm
     }
@@ -147,6 +147,12 @@ export function divabs(...content) {
     return d
 }
 
+export function divabscenter(...content) {
+    const d = div('', ...content)
+    d.set_style({ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' })
+    return d
+}
+
 export function divfix(...content) {
     const d = div('', ...content)
     d.set_style({ position: 'fixed', top: '0px', left: '0px' })
@@ -200,7 +206,8 @@ export function card(classes, ...content) {
 
 export function button(name, onclick) {
     const btn = create_elm('button', '', name)
-    btn.onclick = (...args) => onclick(btn, ...args)
+    btn.addEventListener('click', (...args) => onclick(btn, ...args))
+    // btn.onclick = (...args) => onclick(btn, ...args)
     return btn
 }
 
