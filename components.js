@@ -90,6 +90,11 @@ export function decorate_with_setters(elm) {
         }
     }
 
+    elm.set_click = (func) => {
+        elm.addEventListener('click', func)
+        return elm
+    }
+
     elm.components = []
     elm.set_updater((...args) => elm.components.forEach(c => c?.update?.(...args)))
 
@@ -98,6 +103,8 @@ export function decorate_with_setters(elm) {
     elm.hide = () => { elm.set_style({ display: 'none' }); return elm }
     elm.flex = () => { elm.set_style({ display: 'flex' }); return elm }
     elm.grid = () => { elm.set_style({ display: 'grid' }); return elm }
+    elm.fixed = () => { elm.set_style({ position: 'fixed' }); return elm }
+    elm.absolute = () => { elm.set_style({ position: 'absolute' }); return elm }
     elm.show = () => elm.block()
     elm.containbg = (inside) => {
         elm.set_style({
