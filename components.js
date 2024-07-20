@@ -93,6 +93,21 @@ export function decorate_with_setters(elm) {
     elm.components = []
     elm.set_updater((...args) => elm.components.forEach(c => c?.update?.(...args)))
 
+    elm.inline = () => { elm.set_style({ display: 'inline-block' }); return elm }
+    elm.block = () => { elm.set_style({ display: 'block' }); return elm }
+    elm.hide = () => { elm.set_style({ display: 'none' }); return elm }
+    elm.flex = () => { elm.set_style({ display: 'flex' }); return elm }
+    elm.grid = () => { elm.set_style({ display: 'grid' }); return elm }
+    elm.show = () => elm.block()
+    elm.containbg = (inside) => {
+        elm.set_style({
+            background: inside,
+            backgroundSize: 'contain',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+        }); return elm
+    }
+
     return elm
 }
 
@@ -655,4 +670,8 @@ export function from_table(array) {
         ...array.map(line => create_elm('tr').add(...line.map(elm => create_elm('td', '', elm))))
     )
 
+}
+
+export function is_mobile() {
+    return window.innerWidth <= 650
 }
