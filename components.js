@@ -95,6 +95,13 @@ export function decorate_with_setters(elm) {
         return elm
     }
 
+    elm.set_enter = (func) => {
+        elm.addEventListener('keyup', ({ key }) => {
+            if (key == 'Enter') func()
+        })
+        return elm
+    }
+
     elm.components = []
     elm.set_updater((...args) => elm.components.forEach(c => c?.update?.(...args)))
 
