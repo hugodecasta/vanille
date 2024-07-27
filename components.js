@@ -112,6 +112,7 @@ export function decorate_with_setters(elm) {
     elm.grid = () => { elm.set_style({ display: 'grid' }); return elm }
     elm.fixed = () => { elm.set_style({ position: 'fixed' }); return elm }
     elm.absolute = () => { elm.set_style({ position: 'absolute' }); return elm }
+    elm.relative = () => { elm.set_style({ position: 'relative' }); return elm }
     elm.show = () => elm.block()
     elm.containbg = (inside) => {
         elm.set_style({
@@ -260,7 +261,7 @@ export function select_options(list, pre_selected, cb) {
         const elm_value = list[elm_name]
         const option = create_elm('option', '', elm_name)
         select.add(option)
-        if (elm_name == pre_selected) {
+        if (elm_value == pre_selected) {
             option.setAttribute('selected', true)
         }
         option.value = elm_value
@@ -609,8 +610,8 @@ export function listen_to(variable, action, immediate = false) {
         variable = () => variable_uni
     }
     let past = JSON.stringify(variable())
-    const int = setInterval(() => {
-        const current = JSON.stringify(variable())
+    const int = setInterval(async () => {
+        const current = JSON.stringify(await variable())
         try {
             if (current != past) {
                 action.forEach(f => f())
@@ -688,4 +689,49 @@ export function from_table(array) {
 
 export function is_mobile() {
     return window.innerWidth <= 650
+}
+
+export function make_file_drop_div(div, url, cb) {
+
+    div.set_style({ cursor: 'pointer' })
+
+    function preventDefaults(e) {
+        e.preventDefault()
+        e.stopPropagation()
+    }
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        div.addEventListener(eventName, preventDefaults, false)
+    })
+
+    div.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer
+        const files = dt.files
+        for (const file of files) {
+            uploadFile(file)
+        }
+    }, false)
+
+
+    div.addEventListener('click', () => {
+        const fileInput = input('', 'file', () => { }).add2b().hide()
+        fileInput.addEventListener('change', (e) => {
+            const files = e.target.files;
+            ([...files]).forEach(uploadFile)
+            fileInput.remove()
+        }, false)
+        fileInput.click()
+    })
+
+    async function uploadFile(file) {
+        const formData = new FormData()
+        formData.append('file', file)
+        const data = await (await fetch(url, {
+            method: 'POST',
+            body: formData
+        })).json()
+        cb(data)
+    }
+
+    return div
 }
