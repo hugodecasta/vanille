@@ -735,3 +735,7 @@ export function make_file_drop_div(div, url, cb) {
 
     return div
 }
+
+export function jsoncopy(json) {
+    return JSON.parse(JSON.stringify(json))
+}
