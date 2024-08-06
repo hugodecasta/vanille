@@ -6,6 +6,13 @@ export class INTER_GAME {
 
         return new Promise(async (ok) => {
 
+            this.defered = []
+            setInterval(() => {
+                const defered_to_handle = [...this.defered]
+                this.defered = []
+                defered_to_handle.forEach(packet => data_handler(...packet))
+            }, 1000)
+
             this.connected_sender = await connect_session(
                 session_code,
                 (journal_id, packet) => {
@@ -47,5 +54,8 @@ export class INTER_GAME {
         this.connected_sender(journal_id, { topic, data })
     }
 
+    defer(topic, data) {
+        this.defered.push([topic, data])
+    }
 
 }
