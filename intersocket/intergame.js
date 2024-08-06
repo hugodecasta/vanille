@@ -1,31 +1,55 @@
 import { connect_session } from "./interconnect.js"
 
+class DEFER_SYSTEM {
+
+    constructor(rehandle_func) {
+
+        this.defer_candidate = null
+        this.defered = []
+
+        setInterval(() => {
+            const all_defered = [...this.defered]
+            this.defered = []
+            all_defered.forEach(defered => rehandle_func(defered))
+        }, 1000)
+    }
+
+    prepare_defer(candidate) {
+        this.defer_candidate = candidate
+    }
+    defer() {
+        this.defered.push(this.defer_candidate)
+    }
+}
+
 export class INTER_GAME {
 
     constructor(session_code, welcome, on_welcome, goodbye, on_goodbye, init, data_handler, IS_url = 'https://intersocket.hugocastaneda.fr') {
 
         return new Promise(async (ok) => {
 
-            this.defered = []
-            setInterval(() => {
-                const defered_to_handle = [...this.defered]
-                this.defered = []
-                defered_to_handle.forEach(packet => data_handler(...packet))
-            }, 1000)
+            this.defere_sys = new DEFER_SYSTEM((data) => {
+                root_handler(...data)
+            })
+
+            const root_handler = (topic, data, journal_id) => {
+                this.defere_sys.prepare_defer([topic, data, journal_id])
+                if (topic == 'welcome') {
+                    on_welcome(data)
+                }
+                else if (topic == 'goodbye') {
+                    on_goodbye(data)
+                }
+                else {
+                    data_handler(topic, data, journal_id)
+                }
+            }
 
             this.connected_sender = await connect_session(
                 session_code,
                 (journal_id, packet) => {
                     const { topic, data } = packet
-                    if (topic == 'welcome') {
-                        on_welcome(data)
-                    }
-                    else if (topic == 'goodbye') {
-                        on_goodbye(data)
-                    }
-                    else {
-                        data_handler(topic, data, journal_id)
-                    }
+                    root_handler(topic, data, journal_id)
                 },
                 init,
                 IS_url
@@ -54,8 +78,8 @@ export class INTER_GAME {
         this.connected_sender(journal_id, { topic, data })
     }
 
-    defer(topic, data) {
-        this.defered.push([topic, data])
+    defer() {
+        this.defere_sys.defer()
     }
 
 }
