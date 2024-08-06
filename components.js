@@ -603,7 +603,7 @@ export class EventHandler {
 
 }
 
-export function listen_to(variable, action, immediate = false) {
+export async function listen_to(variable, action, immediate = false) {
     if (!Array.isArray(action)) action = [action]
     if (typeof variable != 'function') {
         const variable_uni = variable
@@ -611,10 +611,11 @@ export function listen_to(variable, action, immediate = false) {
     }
     let past = JSON.stringify(variable())
     const int = setInterval(async () => {
-        const current = JSON.stringify(await variable())
+        const current_value = await variable()
+        const current = JSON.stringify(current_value)
         try {
             if (current != past) {
-                action.forEach(f => f())
+                action.forEach(f => f(current_value))
                 past = current
             }
         } catch (e) {
@@ -623,7 +624,8 @@ export function listen_to(variable, action, immediate = false) {
         }
     }, 10)
     if (immediate) {
-        action.forEach(f => f())
+        const v = await variable()
+        action.forEach(f => f(v))
     }
 }
 
