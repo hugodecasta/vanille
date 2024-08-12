@@ -29,3 +29,9 @@ export function get_url_parameters() {
     }
     return paramDict
 }
+
+export function is_touch_device() {
+    return ('ontouchstart' in window) ||
+        (navigator.maxTouchPoints > 0) ||
+        (navigator.msMaxTouchPoints > 0)
+}
