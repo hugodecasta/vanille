@@ -610,12 +610,16 @@ export async function listen_to(variable, action, immediate = false, timer = 10)
         variable = () => variable_uni
     }
     let past = JSON.stringify(variable())
+    function exec(f, v) {
+        const ret = f(v)
+        if (ret === true) stop()
+    }
     const int = setInterval(async () => {
         const current_value = await variable()
         const current = JSON.stringify(current_value)
         try {
             if (current != past) {
-                action.forEach(f => f(current_value))
+                action.forEach(f => exec(f, current_value))
                 past = current
             }
         } catch (e) {
@@ -625,8 +629,12 @@ export async function listen_to(variable, action, immediate = false, timer = 10)
     }, timer)
     if (immediate) {
         const v = await variable()
-        action.forEach(f => f(v))
+        action.forEach(f => exec(f, v))
     }
+    function stop() {
+        clearInterval(int)
+    }
+    return { stop }
 }
 
 export async function popup_pop(inside_div, end_action, button_func_maker) {
