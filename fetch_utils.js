@@ -35,3 +35,12 @@ export function is_touch_device() {
         (navigator.maxTouchPoints > 0) ||
         (navigator.msMaxTouchPoints > 0)
 }
+
+export function debounce_maker(func, wait = 1000) {
+    let timeout
+    return function (...args) {
+        const context = this
+        clearTimeout(timeout)
+        timeout = setTimeout(() => func.apply(context, args), wait)
+    }
+}
