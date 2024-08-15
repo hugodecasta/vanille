@@ -7,17 +7,20 @@ export class KEYSTATE extends EventHandler {
     current_code_pressed = {}
     one_timer = {}
     mouse = { x: null, y: null }
+    DEBUG = false
 
     constructor() {
         super()
         window.addEventListener('keydown', (evt) => {
             this.state = evt
+            if (this.DEBUG) console.log('keydown', evt.code)
             this.current_pressed[evt.key] = true
             this.current_code_pressed[evt.code] = true
             this.trigger_event('keydown', evt, this.current_pressed)
         })
         window.addEventListener('keyup', (evt) => {
             this.state = {}
+            if (this.DEBUG) console.log('keyup', evt.code)
             delete this.current_pressed[evt.key]
             delete this.current_code_pressed[evt.code]
             delete this.one_timer[evt.code]
@@ -25,11 +28,13 @@ export class KEYSTATE extends EventHandler {
         })
         window.addEventListener('mousedown', (evt) => {
             this.current_code_pressed['MouseDown'] = true
+            if (this.DEBUG) console.log('MouseDown')
             this.mouse.x = evt.clientX
             this.mouse.y = evt.clientY
             this.trigger_event('mousedown', evt, this.current_code_pressed)
         })
         window.addEventListener('mouseup', (evt) => {
+            if (this.DEBUG) console.log('x-MouseDown')
             delete this.current_code_pressed['MouseDown']
             delete this.one_timer['MouseDown']
             this.trigger_event('mouseup', evt, this.current_code_pressed)
