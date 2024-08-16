@@ -39,6 +39,19 @@ export class KEYSTATE extends EventHandler {
             delete this.one_timer['MouseDown']
             this.trigger_event('mouseup', evt, this.current_code_pressed)
         })
+        window.addEventListener('touchstart', (evt) => {
+            this.current_code_pressed['MouseDown'] = true
+            if (this.DEBUG) console.log('MouseDown')
+            this.mouse.x = evt.clientX
+            this.mouse.y = evt.clientY
+            this.trigger_event('mousedown', evt, this.current_code_pressed)
+        })
+        window.addEventListener('touchend', (evt) => {
+            if (this.DEBUG) console.log('x-MouseDown')
+            delete this.current_code_pressed['MouseDown']
+            delete this.one_timer['MouseDown']
+            this.trigger_event('mouseup', evt, this.current_code_pressed)
+        })
     }
 
     confront(key_code) {
