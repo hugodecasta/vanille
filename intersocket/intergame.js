@@ -26,6 +26,8 @@ export class INTER_GAME {
 
     constructor(session_code, welcome, on_welcome, goodbye, on_goodbye, init, data_handler, IS_url = 'https://intersocket.hugocastaneda.fr') {
 
+        this.data_handlers = [data_handler]
+
         return new Promise(async (ok) => {
 
             this.defere_sys = new DEFER_SYSTEM((data) => {
@@ -35,13 +37,13 @@ export class INTER_GAME {
             const root_handler = (topic, data, journal_id) => {
                 this.defere_sys.prepare_defer([topic, data, journal_id])
                 if (topic == 'welcome') {
-                    on_welcome(data)
+                    on_welcome.call(this, data)
                 }
                 else if (topic == 'goodbye') {
-                    on_goodbye(data)
+                    on_goodbye.call(this, data)
                 }
                 else {
-                    data_handler(topic, data, journal_id)
+                    this.data_handlers.forEach(data_handler => data_handler.call(this, topic, data, journal_id))
                 }
             }
 
@@ -51,11 +53,11 @@ export class INTER_GAME {
                     const { topic, data } = packet
                     root_handler(topic, data, journal_id)
                 },
-                init,
+                (journal) => init.call(this, journal),
                 IS_url
             )
 
-            const welcome_data = welcome()
+            const welcome_data = await welcome.call(this)
             this.send_data('welcome', welcome_data, 'welcome' + JSON.stringify(welcome_data) + Date.now())
 
 
@@ -63,8 +65,8 @@ export class INTER_GAME {
                 e.preventDefault()
             })
 
-            window.addEventListener('unload', (e) => {
-                const goodbye_data = goodbye()
+            window.addEventListener('unload', async (e) => {
+                const goodbye_data = await goodbye.call(this)
                 this.send_data('goodbye', goodbye_data, 'goodbye' + JSON.stringify(goodbye_data) + Date.now())
             })
 
@@ -80,6 +82,10 @@ export class INTER_GAME {
 
     defer() {
         this.defere_sys.defer()
+    }
+
+    add_data_handler(data_handler) {
+        this.data_handlers.push(data_handler)
     }
 
 }

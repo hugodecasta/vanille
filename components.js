@@ -48,7 +48,14 @@ export function decorate_with_setters(elm) {
         return elm
     }
     elm.set_attributes = (attributes) => {
-        for (const attr in attributes) elm.setAttribute(attr, attributes[attr])
+        for (const attr in attributes) {
+            if (typeof attributes[attr] == 'boolean') {
+                elm[attr] = attributes[attr]
+            }
+            else {
+                elm.setAttribute(attr, attributes[attr])
+            }
+        }
         return elm
     }
     elm.clear = () => {
