@@ -1,10 +1,12 @@
-import { INTER_GAME } from "./intergame.js"
+import { EventHandler, is_mobile } from "../components.js"
+import { INTER_GAME } from "../intersocket/intergame.js"
 
-export class PEER_CONNECTOR {
+export class PEER_CONNECTOR extends EventHandler {
 
     // ----------------------------------- construct
 
     constructor(session_code, user_name, stream_constraints = { video: false, audio: true }) {
+        super()
         return new Promise(async ok => {
 
             this.stream_constraints = stream_constraints
@@ -26,6 +28,7 @@ export class PEER_CONNECTOR {
                     if (remote_user_name == this.user_name) return
                     this.lines[remote_user_name]?.close()
                     delete this.streams[remote_user_name]
+                    this.trigger_event('stream_change', this.streams)
                 },
                 // --------------------------------- i
                 function () { },
@@ -84,7 +87,7 @@ export class PEER_CONNECTOR {
 
             this.streams = {}
             this.lines = {}
-            // this.get_stream().then(stream => this.streams[user_name] = stream)
+            this.get_stream().then(stream => this.streams[user_name] = stream)
 
             ok(this)
         })
@@ -93,7 +96,28 @@ export class PEER_CONNECTOR {
     // ----------------------------------- stream
 
     async get_stream() {
-        this.stream ??= await navigator.mediaDevices.getUserMedia(this.stream_constraints)
+        // window.stream_file = is_mobile() ? '/audio_test/matelot.wav' : '/audio_test/test.wav'
+        if (window.stream_file && !this.stream) {
+            if (!this.stream) {
+                const audio_context = new AudioContext()
+                const mediaStreamDestination = audio_context.createMediaStreamDestination()
+
+                const response = await fetch(window.stream_file)
+                const arrayBuffer = await response.arrayBuffer()
+                const audio_buffer = await audio_context.decodeAudioData(arrayBuffer)
+
+                const source = audio_context.createBufferSource()
+                source.buffer = audio_buffer
+                source.loop = true
+                source.connect(mediaStreamDestination)
+                source.start(0)
+
+                this.stream = mediaStreamDestination.stream
+            }
+        }
+        else {
+            this.stream ??= await navigator.mediaDevices.getUserMedia(this.stream_constraints)
+        }
         return this.stream
     }
 
@@ -118,6 +142,7 @@ export class PEER_CONNECTOR {
         }
         rtc.onaddstream = ({ stream }) => {
             this.streams[remote_user_name] = stream
+            this.trigger_event('stream_change', this.streams)
         }
         return rtc
     }

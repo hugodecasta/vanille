@@ -756,3 +756,19 @@ export function make_file_drop_div(div, url, cb) {
 export function jsoncopy(json) {
     return JSON.parse(JSON.stringify(json))
 }
+
+export function invert_json(json) {
+    const inverted = {}
+    for (const [key, value] of Object.entries(json)) {
+        const values = Array.isArray(value) ? value : [value]
+        values.forEach(v => {
+            inverted[v] ??= []
+            inverted[v].push(key)
+        })
+    }
+    return inverted
+}
+
+export function flatten_distinct(array) {
+    return array.reduce((a, b) => a.concat(b), []).filter((e, i, s) => s.indexOf(e) == i)
+}
