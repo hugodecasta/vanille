@@ -1,4 +1,4 @@
-import { create_elm, div, divfix, invert_json, listen_to } from "../components.js"
+import { create_elm, div, divfix, invert_json, jsoncopy, listen_to } from "../components.js"
 import { INTER_GAME } from "../intersocket/intergame.js"
 import { create_filtered_stream } from "./audio_utils.js"
 import { PEER_CONNECTOR } from "./rtc_peer_connector.js"
@@ -7,11 +7,12 @@ export class CHANNEL_SYS {
 
     // ------------------------------------------------------------
 
-    constructor(session_code, user_name, channel_infos) {
+    constructor(session_code, user_name, channel_infos = {}) {
         return new Promise(async ok => {
 
             // ------------------------------------------
 
+            this.current_prefix = ''
             this.user_name = user_name
             this.channel_infos = channel_infos
             const my_channels = this.my_channels = {
@@ -60,6 +61,12 @@ export class CHANNEL_SYS {
 
             // ------------------------------------------
 
+            // channel solver
+            const chs = (channel) => {
+                const name = Object.keys(this.channel_infos).find(chn => channel.includes(chn))
+                return this.channel_infos[name]
+            }
+
             const audio_sys = divfix().add2b().set_style({ top: '', bottom: '10px' })
             listen_to(() => this.known_channels, async (known_channels) => {
                 const channel_talkers_map = invert_json(
@@ -73,12 +80,12 @@ export class CHANNEL_SYS {
                         .map(channel => channel_talkers_map[channel]?.map(user => ({ user, channel })))
                         .filter(e => e)
                         .reduce((a, b) => a.concat(b), [])
-                        .filter(({ user, channel }) => user != user_name || channel_infos[channel]?.loop === true)
+                        .filter(({ user, channel }) => user != user_name || chs(channel)?.loop === true)
                 const new_audio = div()
 
                 for (const { user, channel } of talkers) {
 
-                    const input_filter = channel_infos[channel]?.filter ?? []
+                    const input_filter = chs(channel)?.filter ?? []
                     const filter = typeof input_filter == 'function' ? input_filter(user) : input_filter
 
                     await new Promise((ok) => {
@@ -107,11 +114,13 @@ export class CHANNEL_SYS {
 
     // ------------------------------------------------------------
 
-    add_channel(type, name) {
+    add_channel(type, name, use_prefix = true) {
+        name = !use_prefix ? name : this.current_prefix + name
         this.remove_channel(type, name)
         this.my_channels[type].push(name)
     }
-    remove_channel(type, name) {
+    remove_channel(type, name, use_prefix = true) {
+        name = !use_prefix ? name : this.current_prefix + name
         const index = this.my_channels[type].indexOf(name)
         this.my_channels[type].splice(index, index > -1 ? 1 : 0)
     }
