@@ -75,8 +75,12 @@ export class CHANNEL_SYS {
                         .reduce((a, b) => a.concat(b), [])
                         .filter(({ user, channel }) => user != user_name || channel_infos[channel]?.loop === true)
                 const new_audio = div()
+
                 for (const { user, channel } of talkers) {
-                    const filter = channel_infos[channel]?.filter ?? []
+
+                    const input_filter = channel_infos[channel]?.filter ?? []
+                    const filter = typeof input_filter == 'function' ? input_filter(user) : input_filter
+
                     await new Promise((ok) => {
                         let int = setInterval(() => {
                             if (!pc.streams[user]) return
