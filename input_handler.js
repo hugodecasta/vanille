@@ -8,6 +8,7 @@ export class KEYSTATE extends EventHandler {
     one_timer = {}
     mouse = { x: null, y: null }
     DEBUG = false
+    last_mouse_button = null
 
     constructor() {
         super()
@@ -28,15 +29,24 @@ export class KEYSTATE extends EventHandler {
         })
         window.addEventListener('mousedown', (evt) => {
             this.current_code_pressed['MouseDown'] = true
+            this.last_mouse_button = evt.buttons
+            this.current_code_pressed['MouseButton' + this.last_mouse_button] = true
             if (this.DEBUG) console.log('MouseDown')
             this.mouse.x = evt.clientX
             this.mouse.y = evt.clientY
             this.trigger_event('mousedown', evt, this.current_code_pressed)
         })
+        window.addEventListener('mousemove', (evt) => {
+            this.mouse.x = evt.clientX
+            this.mouse.y = evt.clientY
+            this.trigger_event('mousedowmousemoven', evt, this.mouse)
+        })
         window.addEventListener('mouseup', (evt) => {
             if (this.DEBUG) console.log('x-MouseDown')
             delete this.current_code_pressed['MouseDown']
+            delete this.current_code_pressed['MouseButton' + this.last_mouse_button]
             delete this.one_timer['MouseDown']
+            delete this.one_timer['MouseButton' + this.last_mouse_button]
             this.trigger_event('mouseup', evt, this.current_code_pressed)
         })
         window.addEventListener('touchstart', (evt) => {
