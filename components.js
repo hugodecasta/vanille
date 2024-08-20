@@ -621,12 +621,15 @@ export async function listen_to(variable, action, immediate = false, timer = 10)
         const ret = f(v)
         if (ret === true) stop()
     }
+    function trigger(current_value) {
+        action.forEach(f => exec(f, current_value))
+    }
     const int = setInterval(async () => {
         const current_value = await variable()
         const current = JSON.stringify(current_value)
         try {
             if (current != past) {
-                action.forEach(f => exec(f, current_value))
+                trigger(current_value)
                 past = current
             }
         } catch (e) {
@@ -641,7 +644,7 @@ export async function listen_to(variable, action, immediate = false, timer = 10)
     function stop() {
         clearInterval(int)
     }
-    return { stop }
+    return { stop, trigger }
 }
 
 export async function popup_pop(inside_div, end_action, button_func_maker) {
