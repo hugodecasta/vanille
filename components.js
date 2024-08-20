@@ -711,7 +711,11 @@ export function is_mobile() {
     return window.innerWidth <= 650
 }
 
-export function make_file_drop_div(div, url, cb) {
+export function file_drop_div(url, cb, on_drag_enter = null, in_drag_leave = null, on_drop = null) {
+    return make_file_drop_div(div(), url, cb, on_drag_enter, in_drag_leave, on_drop)
+}
+
+export function make_file_drop_div(div, url, cb, on_drag_enter = null, in_drag_leave = null, on_drop = null) {
 
     div.set_style({ cursor: 'pointer' })
 
@@ -724,9 +728,13 @@ export function make_file_drop_div(div, url, cb) {
         div.addEventListener(eventName, preventDefaults, false)
     })
 
+    div.addEventListener('dragenter', () => on_drag_enter?.(div))
+    div.addEventListener('dragleave', () => in_drag_leave?.(div))
+
     div.addEventListener('drop', (e) => {
         const dt = e.dataTransfer
         const files = dt.files
+        on_drop?.(div, files)
         for (const file of files) {
             uploadFile(file)
         }
@@ -746,11 +754,12 @@ export function make_file_drop_div(div, url, cb) {
     async function uploadFile(file) {
         const formData = new FormData()
         formData.append('file', file)
-        const data = await (await fetch(url, {
+        if (typeof url != 'function') url = () => url
+        const data = await (await fetch(url(file), {
             method: 'POST',
             body: formData
         })).json()
-        cb(data)
+        cb(data, div)
     }
 
     return div
