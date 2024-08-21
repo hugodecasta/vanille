@@ -711,11 +711,11 @@ export function is_mobile() {
     return window.innerWidth <= 650
 }
 
-export function file_drop_div(url, cb, on_drag_enter = null, in_drag_leave = null, on_drop = null) {
-    return make_file_drop_div(div(), url, cb, on_drag_enter, in_drag_leave, on_drop)
+export function file_drop_div(url, cb, multiple = false, on_drag_enter = null, in_drag_leave = null, on_drop = null) {
+    return make_file_drop_div(div(), url, cb, multiple, on_drag_enter, in_drag_leave, on_drop)
 }
 
-export function make_file_drop_div(div, url, cb, on_drag_enter = null, in_drag_leave = null, on_drop = null) {
+export function make_file_drop_div(div, url, cb, multiple = false, on_drag_enter = null, in_drag_leave = null, on_drop = null) {
 
     div.set_style({ cursor: 'pointer' })
 
@@ -742,7 +742,7 @@ export function make_file_drop_div(div, url, cb, on_drag_enter = null, in_drag_l
 
 
     div.addEventListener('click', () => {
-        const fileInput = input('', 'file', () => { }).add2b().hide()
+        const fileInput = input('', 'file', () => { }).add2b().hide().set_attributes({ multiple: multiple })
         fileInput.addEventListener('change', (e) => {
             const files = e.target.files;
             ([...files]).forEach(uploadFile)
