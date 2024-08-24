@@ -621,12 +621,15 @@ export async function listen_to(variable, action, immediate = false, timer = 10)
         const ret = f(v)
         if (ret === true) stop()
     }
+    function trigger(current_value) {
+        action.forEach(f => exec(f, current_value))
+    }
     const int = setInterval(async () => {
         const current_value = await variable()
         const current = JSON.stringify(current_value)
         try {
             if (current != past) {
-                action.forEach(f => exec(f, current_value))
+                trigger(current_value)
                 past = current
             }
         } catch (e) {
@@ -641,7 +644,7 @@ export async function listen_to(variable, action, immediate = false, timer = 10)
     function stop() {
         clearInterval(int)
     }
-    return { stop }
+    return { stop, trigger }
 }
 
 export async function popup_pop(inside_div, end_action, button_func_maker) {
@@ -708,7 +711,11 @@ export function is_mobile() {
     return window.innerWidth <= 650
 }
 
-export function make_file_drop_div(div, url, cb) {
+export function file_drop_div(url, cb, multiple = false, on_drag_enter = null, in_drag_leave = null, on_drop = null) {
+    return make_file_drop_div(div(), url, cb, multiple, on_drag_enter, in_drag_leave, on_drop)
+}
+
+export function make_file_drop_div(div, url, cb, multiple = false, on_drag_enter = null, in_drag_leave = null, on_drop = null) {
 
     div.set_style({ cursor: 'pointer' })
 
@@ -721,9 +728,13 @@ export function make_file_drop_div(div, url, cb) {
         div.addEventListener(eventName, preventDefaults, false)
     })
 
+    div.addEventListener('dragenter', () => on_drag_enter?.(div))
+    div.addEventListener('dragleave', () => in_drag_leave?.(div))
+
     div.addEventListener('drop', (e) => {
         const dt = e.dataTransfer
         const files = dt.files
+        on_drop?.(div, files)
         for (const file of files) {
             uploadFile(file)
         }
@@ -731,7 +742,7 @@ export function make_file_drop_div(div, url, cb) {
 
 
     div.addEventListener('click', () => {
-        const fileInput = input('', 'file', () => { }).add2b().hide()
+        const fileInput = input('', 'file', () => { }).add2b().hide().set_attributes({ multiple: multiple })
         fileInput.addEventListener('change', (e) => {
             const files = e.target.files;
             ([...files]).forEach(uploadFile)
@@ -743,11 +754,12 @@ export function make_file_drop_div(div, url, cb) {
     async function uploadFile(file) {
         const formData = new FormData()
         formData.append('file', file)
-        const data = await (await fetch(url, {
+        if (typeof url != 'function') url = () => url
+        const data = await (await fetch(url(file), {
             method: 'POST',
             body: formData
         })).json()
-        cb(data)
+        cb(data, div)
     }
 
     return div

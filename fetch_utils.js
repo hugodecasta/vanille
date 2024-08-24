@@ -2,6 +2,10 @@ export async function get_json(ep, op) {
     return await (await fetch(ep, op)).json()
 }
 
+export async function get_text(ep, op) {
+    return await (await fetch(ep, op)).text()
+}
+
 export async function post_json(ep, json_data, op = {}) {
     return await (await fetch(ep, {
         method: 'post',
