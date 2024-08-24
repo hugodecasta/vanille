@@ -22,6 +22,7 @@ export class CHANNEL_SYS {
             this.known_channels = {
                 [user_name]: my_channels
             }
+            this.known_user_channel_pair = {}
 
             // ------------------------------------------
 
@@ -33,6 +34,7 @@ export class CHANNEL_SYS {
 
                 () => ({ user_name }),
                 ({ user_name }) => {
+                    console.log('goodbye', user_name)
                     delete this.known_channels[user_name]
                 },
 
@@ -69,6 +71,7 @@ export class CHANNEL_SYS {
 
             const audio_sys = divfix().add2b().set_style({ top: '', bottom: '10px' })
             listen_to(() => this.known_channels, async (known_channels) => {
+
                 const channel_talkers_map = invert_json(
                     Object.fromEntries(
                         Object.entries(known_channels).map(([name, { talk }]) => [name, talk])
@@ -81,29 +84,31 @@ export class CHANNEL_SYS {
                         .filter(e => e)
                         .reduce((a, b) => a.concat(b), [])
                         .filter(({ user, channel }) => user != user_name || chs(channel)?.loop === true)
-                const new_audio = div()
+
+                Object.values(this.known_user_channel_pair).forEach(a => a.pause())
 
                 for (const { user, channel } of talkers) {
-
-                    const input_filter = chs(channel)?.filter ?? []
-                    const filter = typeof input_filter == 'function' ? input_filter(user) : input_filter
-
-                    await new Promise((ok) => {
-                        let int = setInterval(() => {
-                            if (!pc.streams[user]) return
-                            clearInterval(int)
-                            ok()
+                    const pair_name = user + '-' + channel
+                    if (!this.known_user_channel_pair[pair_name]) {
+                        const input_filter = chs(channel)?.filter ?? []
+                        const filter = typeof input_filter == 'function' ? input_filter(user) : input_filter
+                        await new Promise((ok) => {
+                            let int = setInterval(() => {
+                                if (!pc.streams[user]) return
+                                clearInterval(int)
+                                ok()
+                            })
                         })
-                    })
-                    const base_stream = pc.streams[user]
-                    const out_stream = create_filtered_stream(base_stream, filter)
-                    const audio = create_elm('audio')
-                    audio.autoplay = true
-                    audio.controls = true
-                    audio.srcObject = out_stream
-                    audio.add2(new_audio)
+                        const base_stream = pc.streams[user]
+                        const out_stream = create_filtered_stream(base_stream, filter)
+                        const audio = create_elm('audio')
+                        // audio.controls = true
+                        audio.srcObject = out_stream
+                        audio.add2(audio_sys)
+                        this.known_user_channel_pair[pair_name] = audio
+                    }
+                    this.known_user_channel_pair[pair_name].play()
                 }
-                audio_sys.clear().add(new_audio)
             }, true)
 
             // ------------------------------------------

@@ -138,7 +138,7 @@ export class PEER_CONNECTOR extends EventHandler {
                 label: event.candidate.sdpMLineIndex,
                 id: event.candidate.sdpMid,
                 candidate: event.candidate.candidate,
-            })
+            }, 'candidate-' + remote_user_name)
         }
         rtc.onaddstream = ({ stream }) => {
             this.streams[remote_user_name] = stream
