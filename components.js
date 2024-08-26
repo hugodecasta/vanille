@@ -36,6 +36,10 @@ export function decorate_with_setters(elm) {
         add_to_elm(parent, elm)
         return elm
     }
+    elm.inner_html = (str_data) => {
+        elm.innerHTML = str_data
+        return elm
+    }
     elm.add2b = (parent) => {
         bodyAdd(elm)
         return elm

@@ -34,7 +34,6 @@ export class CHANNEL_SYS {
 
                 () => ({ user_name }),
                 ({ user_name }) => {
-                    console.log('goodbye', user_name)
                     delete this.known_channels[user_name]
                 },
 
@@ -90,23 +89,25 @@ export class CHANNEL_SYS {
                 for (const { user, channel } of talkers) {
                     const pair_name = user + '-' + channel
                     if (!this.known_user_channel_pair[pair_name]) {
-                        const input_filter = chs(channel)?.filter ?? []
-                        const filter = typeof input_filter == 'function' ? input_filter(user) : input_filter
-                        await new Promise((ok) => {
-                            let int = setInterval(() => {
-                                if (!pc.streams[user]) return
-                                clearInterval(int)
-                                ok()
-                            })
-                        })
-                        const base_stream = pc.streams[user]
-                        const out_stream = create_filtered_stream(base_stream, filter)
-                        const audio = create_elm('audio')
-                        // audio.controls = true
-                        audio.srcObject = out_stream
-                        audio.add2(audio_sys)
+                        const audio = create_elm('audio').add2(audio_sys)
                         this.known_user_channel_pair[pair_name] = audio
                     }
+                    const input_filter = chs(channel)?.filter ?? []
+                    const filter = typeof input_filter == 'function' ? input_filter(user) : input_filter
+                    await new Promise((ok) => {
+                        let int = setInterval(() => {
+                            if (!pc.streams[user]) return
+                            clearInterval(int)
+                            ok()
+                        })
+                    })
+                    const base_stream = pc.streams[user]
+                    const out_stream = create_filtered_stream(base_stream, filter)
+
+                    const audio = this.known_user_channel_pair[pair_name]
+                    audio.srcObject = out_stream
+
+                    this.known_user_channel_pair[pair_name] = audio
                     this.known_user_channel_pair[pair_name].play()
                 }
             }, true)
