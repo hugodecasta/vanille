@@ -614,7 +614,7 @@ export class EventHandler {
 
 }
 
-export async function listen_to(variable, action, immediate = false, timer = 10) {
+export function listen_to(variable, action, immediate = false, timer = 10) {
     if (!Array.isArray(action)) action = [action]
     if (typeof variable != 'function') {
         const variable_uni = variable
@@ -642,8 +642,10 @@ export async function listen_to(variable, action, immediate = false, timer = 10)
         }
     }, timer)
     if (immediate) {
-        const v = await variable()
-        action.forEach(f => exec(f, v))
+        setTimeout(async () => {
+            const v = await variable()
+            action.forEach(f => exec(f, v))
+        })
     }
     function stop() {
         clearInterval(int)
