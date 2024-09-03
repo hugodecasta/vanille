@@ -747,7 +747,8 @@ export function make_file_drop_div(div, url, cb, multiple = false, on_drag_enter
     }, false)
 
 
-    div.addEventListener('click', () => {
+    div.addEventListener('click', (evt) => {
+        if (evt.target != div) return
         const fileInput = input('', 'file', () => { }).add2b().hide().set_attributes({ multiple: multiple })
         fileInput.addEventListener('change', (e) => {
             const files = e.target.files;
