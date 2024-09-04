@@ -51,6 +51,15 @@ export function decorate_with_setters(elm) {
         }
         return elm
     }
+    elm.margin = (margin_data) => {
+        margin_data = Object.fromEntries(
+            Object.entries(margin_data).map(([side, amount]) => [
+                'margin-' + side, typeof amount == 'string' ? amount : (amount + 'px')
+            ])
+        )
+        elm.set_style(margin_data)
+        return elm
+    }
     elm.set_attributes = (attributes) => {
         for (const attr in attributes) {
             if (typeof attributes[attr] == 'boolean') {
@@ -268,6 +277,11 @@ export function get_list(list) {
 export function select_options(list, pre_selected, cb) {
     const select = create_elm('select')
     list = get_list(list)
+    const keys = Object.keys(list)
+    if (!keys.includes(pre_selected)) {
+        pre_selected = keys[0]
+        cb(pre_selected)
+    }
     for (const elm_name in list) {
         const elm_value = list[elm_name]
         const option = create_elm('option', '', elm_name)

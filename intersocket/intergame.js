@@ -27,6 +27,7 @@ export class INTER_GAME {
     constructor(session_code, welcome, on_welcome, goodbye, on_goodbye, init, data_handler, IS_url = 'https://intersocket.hugocastaneda.fr') {
 
         this.data_handlers = [data_handler]
+        this.on_topicers = {}
 
         return new Promise(async (ok) => {
 
@@ -34,8 +35,17 @@ export class INTER_GAME {
                 root_handler(...data)
             })
 
+            this.buffer = []
+            let buffering = true
+            setTimeout(() => {
+                buffering = false
+                this.buffer.splice(0, 100000000)
+                this.buffer = []
+            }, 3000)
+
             const root_handler = (topic, data, journal_id) => {
                 this.defere_sys.prepare_defer([topic, data, journal_id])
+                this.buffer.push([topic, data, journal_id])
                 if (topic == 'welcome') {
                     on_welcome.call(this, data)
                 }
@@ -44,6 +54,7 @@ export class INTER_GAME {
                 }
                 else {
                     this.data_handlers.forEach(data_handler => data_handler.call(this, topic, data, journal_id))
+                    this.on_topicers[topic]?.forEach(data_handler => data_handler.call(this, data, journal_id))
                 }
             }
 
@@ -73,6 +84,12 @@ export class INTER_GAME {
             ok(this)
 
         })
+    }
+
+    on_topic(topic, func) {
+        this.on_topicers[topic] ??= []
+        this.on_topicers[topic].push(func)
+        this.buffer.forEach(b => func(...b))
     }
 
     send_data(topic, data, journal_id = null) {
