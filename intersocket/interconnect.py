@@ -8,8 +8,14 @@ socket = socketio.Client()
 
 def connect_session(session_code, on_journal_data, init, IS_url='https://intersocket.hugocastaneda.fr'):
 
+    def fake_sender(a, b):
+        pass
     if not socket.connected:
-        socket.connect(IS_url)
+        try:
+            socket.connect(IS_url)
+        except:
+            print('DISCONNECTED SOCKER, using fake sender !')
+            return fake_sender
 
     def session_topic(topic):
         return f'session_{session_code}_{topic}'
