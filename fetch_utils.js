@@ -4,7 +4,8 @@ const cached = {}
 
 export async function get_json(ep, op) {
     if (cached[ep] && cached[ep].data) {
-        return jsoncopy(cached[ep].data)
+        console.log('CACHED', ep)
+        return cached[ep].data
     }
     return await (await fetch(ep, op)).json()
 }
