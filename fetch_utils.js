@@ -13,7 +13,7 @@ export function set_cached_json(ep, op) {
     cached[ep] ??= {
         int: setInterval(async () => {
             cached[ep].data = await (await fetch(ep, op)).json()
-        }, 1000)
+        }, 5000)
     }
 }
 
