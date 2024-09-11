@@ -115,6 +115,15 @@ export function decorate_with_setters(elm) {
         return elm
     }
 
+    elm.set_db_click = (func) => {
+        let to = null
+        elm.addEventListener('mousedown', (...args) => {
+            if (to) func(...args)
+            to = setTimeout(() => to = null, 500)
+        })
+        return elm
+    }
+
     elm.set_enter = (func) => {
         elm.addEventListener('keyup', ({ key }) => {
             if (key == 'Enter') func()
