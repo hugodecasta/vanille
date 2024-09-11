@@ -3,10 +3,10 @@ import time
 
 # Create a socket.io client instance
 
-socket = socketio.Client()
-
 
 def connect_session(session_code, on_journal_data, init, IS_url='https://intersocket.hugocastaneda.fr'):
+
+    socket = socketio.Client()
 
     def fake_sender(a, b):
         pass
@@ -31,23 +31,23 @@ def connect_session(session_code, on_journal_data, init, IS_url='https://interso
 
     # ----------------------------------------------------------- ON JOURNAL
 
-    if init is not None:
-        @socket.on(session_topic('journal'))
-        def on_journal(journal):
+    @socket.on(session_topic('journal'))
+    def on_journal(journal):
+        if init is not None:
             init(journal)
+        if on_journal_data is not None:
             for journal_id, content in journal.items():
                 on_journal_data(journal_id, content)
 
     # ----------------------------------------------------------- SEND DATA
 
     def send_data(journal_id, data):
-        global socket
         try:
             socket.emit(session_topic('data'), {'journal_id': journal_id, 'data': data})
         except Exception as e:
-            socket = socketio.Client()
-            if not socket.connected:
-                socket.connect(IS_url)
+            # socket = socketio.Client()
+            # if not socket.connected:
+            #     socket.connect(IS_url)
             print('could not send data...', e)
             time.sleep(1)
 
