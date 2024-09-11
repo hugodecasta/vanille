@@ -1,5 +1,20 @@
+import { jsoncopy } from "./components.js"
+
+const cached = {}
+
 export async function get_json(ep, op) {
+    if (cached[ep] && cached[ep].data) {
+        return cached[ep].data
+    }
     return await (await fetch(ep, op)).json()
+}
+
+export function set_cached_json(ep, op) {
+    cached[ep] ??= {
+        int: setInterval(async () => {
+            cached[ep].data = await (await fetch(ep, op)).json()
+        }, 5000)
+    }
 }
 
 export async function get_text(ep, op) {
