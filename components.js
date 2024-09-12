@@ -146,7 +146,7 @@ export function decorate_with_setters(elm) {
     elm.inline = () => { elm.set_style({ display: 'inline-block' }); return elm }
     elm.block = () => { elm.set_style({ display: 'block' }); return elm }
     elm.hide = () => { elm.set_style({ display: 'none' }); return elm }
-    elm.flex = () => { elm.set_style({ display: 'flex' }); return elm }
+    elm.flex = (set = true) => { elm.set_style({ display: set ? 'flex' : '' }); return elm }
     elm.grid = () => { elm.set_style({ display: 'grid' }); return elm }
     elm.fixed = () => { elm.set_style({ position: 'fixed' }); return elm }
     elm.absolute = () => { elm.set_style({ position: 'absolute' }); return elm }
