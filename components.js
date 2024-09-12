@@ -60,6 +60,15 @@ export function decorate_with_setters(elm) {
         elm.set_style(margin_data)
         return elm
     }
+    elm.padding = (padding_data) => {
+        padding_data = Object.fromEntries(
+            Object.entries(padding_data).map(([side, amount]) => [
+                'padding-' + side, typeof amount == 'string' ? amount : (amount + 'px')
+            ])
+        )
+        elm.set_style(padding_data)
+        return elm
+    }
     elm.set_attributes = (attributes) => {
         for (const attr in attributes) {
             if (typeof attributes[attr] == 'boolean') {
