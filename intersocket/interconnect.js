@@ -19,7 +19,7 @@ export function connect_session(session_code, on_journal_data, init, IS_url = 'h
     // ----------------------------------------------------------- ON JOURNAL
 
     socket.on(session_topic('journal'), (journal) => {
-        init(journal)
+        init?.(journal)
         for (const journal_id in journal) {
             on_journal_data(journal_id, journal[journal_id])
         }
