@@ -60,6 +60,15 @@ export function decorate_with_setters(elm) {
         elm.set_style(margin_data)
         return elm
     }
+    elm.padding = (padding_data) => {
+        padding_data = Object.fromEntries(
+            Object.entries(padding_data).map(([side, amount]) => [
+                'padding-' + side, typeof amount == 'string' ? amount : (amount + 'px')
+            ])
+        )
+        elm.set_style(padding_data)
+        return elm
+    }
     elm.set_attributes = (attributes) => {
         for (const attr in attributes) {
             if (typeof attributes[attr] == 'boolean') {
@@ -115,6 +124,15 @@ export function decorate_with_setters(elm) {
         return elm
     }
 
+    elm.set_db_click = (func) => {
+        let to = null
+        elm.addEventListener('mousedown', (...args) => {
+            if (to) func(...args)
+            to = setTimeout(() => to = null, 500)
+        })
+        return elm
+    }
+
     elm.set_enter = (func) => {
         elm.addEventListener('keyup', ({ key }) => {
             if (key == 'Enter') func()
@@ -128,7 +146,7 @@ export function decorate_with_setters(elm) {
     elm.inline = () => { elm.set_style({ display: 'inline-block' }); return elm }
     elm.block = () => { elm.set_style({ display: 'block' }); return elm }
     elm.hide = () => { elm.set_style({ display: 'none' }); return elm }
-    elm.flex = () => { elm.set_style({ display: 'flex' }); return elm }
+    elm.flex = (set = true) => { elm.set_style({ display: set ? 'flex' : '' }); return elm }
     elm.grid = () => { elm.set_style({ display: 'grid' }); return elm }
     elm.fixed = () => { elm.set_style({ position: 'fixed' }); return elm }
     elm.absolute = () => { elm.set_style({ position: 'absolute' }); return elm }

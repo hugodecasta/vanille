@@ -1,4 +1,4 @@
-import { jsoncopy } from "./components.js"
+import { alink, jsoncopy } from "./components.js"
 
 const cached = {}
 
@@ -62,4 +62,8 @@ export function debounce_maker(func, wait = 1000) {
         clearTimeout(timeout)
         timeout = setTimeout(() => func.apply(context, args), wait)
     }
+}
+
+export function click_link(link, target) {
+    alink(link, target, '').click()
 }
