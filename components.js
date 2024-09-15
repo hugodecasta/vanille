@@ -61,6 +61,13 @@ export function decorate_with_setters(elm) {
         return elm
     }
     elm.padding = (padding_data) => {
+        if (typeof padding_data == 'number') {
+            padding_data = padding_data + 'px'
+        }
+        if (typeof padding_data == 'string') {
+            elm.set_style({ padding: padding_data })
+            return elm
+        }
         padding_data = Object.fromEntries(
             Object.entries(padding_data).map(([side, amount]) => [
                 'padding-' + side, typeof amount == 'string' ? amount : (amount + 'px')
@@ -151,6 +158,8 @@ export function decorate_with_setters(elm) {
     elm.fixed = () => { elm.set_style({ position: 'fixed' }); return elm }
     elm.absolute = () => { elm.set_style({ position: 'absolute' }); return elm }
     elm.relative = () => { elm.set_style({ position: 'relative' }); return elm }
+    elm.grow = () => elm.set_style({ flewGrow: 1 })
+    elm.wrap = () => elm.set_style({ flexWrap: 'wrap' })
     elm.show = () => elm.block()
     elm.containbg = (inside) => {
         elm.set_style({
