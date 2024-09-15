@@ -52,6 +52,13 @@ export function decorate_with_setters(elm) {
         return elm
     }
     elm.margin = (margin_data) => {
+        if (typeof margin_data == 'number') {
+            margin_data = margin_data + 'px'
+        }
+        if (typeof margin_data == 'string') {
+            elm.set_style({ margin: margin_data })
+            return elm
+        }
         margin_data = Object.fromEntries(
             Object.entries(margin_data).map(([side, amount]) => [
                 'margin-' + side, typeof amount == 'string' ? amount : (amount + 'px')
