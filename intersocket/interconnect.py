@@ -49,6 +49,8 @@ def connect_session(session_code, on_journal_data, init, IS_url='https://interso
             # if not socket.connected:
             #     socket.connect(IS_url)
             print('could not send data...', e)
+            import os
+            os._exit(0)
             time.sleep(1)
 
     # ----------------------------------------------------------- CONNECT
