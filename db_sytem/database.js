@@ -41,19 +41,24 @@ export class DATABASE {
     constructor(name, default_object, force = false) {
 
         this.object = DATABASE.get(name, default_object, true)
+        this.name = name
 
         if (force) this.object = default_object
 
         this.before_save = []
         this.int = setInterval(() => {
             if (stop_saving) return clearInterval(this.int)
-            this.before_save.forEach(f => f(this.object))
-            DATABASE.set(name, this.object, true)
+            this.save()
 
         }, 500)
 
         this.onload(this.object)
 
+    }
+
+    save() {
+        this.before_save.forEach(f => f(this.object))
+        DATABASE.set(this.name, this.object, true)
     }
 
     onload(object) {
