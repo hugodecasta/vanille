@@ -67,3 +67,13 @@ export function debounce_maker(func, wait = 1000) {
 export function click_link(link, target) {
     alink(link, target, '').click()
 }
+
+export function download_file(filename, content) {
+    const blob = new Blob([content], { type: 'text/plain' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+}
