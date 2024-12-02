@@ -168,13 +168,19 @@ export function decorate_with_setters(elm) {
     elm.grow = () => elm.set_style({ flewGrow: 1 })
     elm.wrap = () => elm.set_style({ flexWrap: 'wrap' })
     elm.show = () => elm.block()
-    elm.containbg = (inside) => {
+    elm.containbg = (inside, size, sizeh) => {
         elm.set_style({
             background: inside,
             backgroundSize: 'contain',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
+            width: size, height: sizeh ?? size
         }); return elm
+    }
+
+    elm.on = (evt_name, func) => {
+        elm.addEventListener(evt_name, func)
+        return elm
     }
 
     return elm
