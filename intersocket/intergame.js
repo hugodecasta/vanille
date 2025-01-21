@@ -24,7 +24,14 @@ class DEFER_SYSTEM {
 
 export class INTER_GAME {
 
-    constructor(session_code, welcome, on_welcome, goodbye, on_goodbye, init, data_handler, IS_url = 'https://intersocket.hugocastaneda.fr') {
+    constructor(
+        session_code,
+        welcome, on_welcome,
+        goodbye, on_goodbye,
+        init, data_handler,
+        force_close_ask = true,
+        IS_url = 'https://intersocket.hugocastaneda.fr',
+    ) {
 
         this.data_handlers = [data_handler]
         this.on_topicers = {}
@@ -72,14 +79,23 @@ export class INTER_GAME {
             this.send_data('welcome', welcome_data, 'welcome' + JSON.stringify(welcome_data) + Date.now())
 
 
-            window.addEventListener('beforeunload', (e) => {
-                e.preventDefault()
-            })
-
-            window.addEventListener('unload', async (e) => {
-                const goodbye_data = await goodbye.call(this)
-                this.send_data('goodbye', goodbye_data, 'goodbye' + JSON.stringify(goodbye_data) + Date.now())
-            })
+            if (force_close_ask === true) {
+                window.addEventListener('beforeunload', (e) => {
+                    e.preventDefault()
+                })
+                window.addEventListener('unload', async (e) => {
+                    const goodbye_data = await goodbye.call(this)
+                    this.send_data('goodbye', goodbye_data, 'goodbye' + JSON.stringify(goodbye_data) + Date.now())
+                })
+            }
+            else if (typeof (force_close_ask) == 'function') {
+                window.addEventListener('beforeunload', async (e) => {
+                    e.preventDefault()
+                    const goodbye_data = await goodbye.call(this)
+                    this.send_data('goodbye', goodbye_data, 'goodbye' + JSON.stringify(goodbye_data) + Date.now())
+                    force_close_ask()
+                })
+            }
 
             ok(this)
 
