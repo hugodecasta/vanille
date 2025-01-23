@@ -2,8 +2,12 @@ let socket = null
 
 export function connect_session(session_code, on_journal_data, init, IS_url = 'https://intersocket.hugocastaneda.fr') {
 
-    if (!socket) {
-        socket = io(IS_url)
+    // if (!socket) {
+    const socket = io(IS_url)
+    // }
+
+    function disconnect() {
+        socket.disconnect()
     }
 
     function session_topic(topic) {
@@ -37,7 +41,7 @@ export function connect_session(session_code, on_journal_data, init, IS_url = 'h
     socket.emit(session_topic('journal'))
 
     return new Promise((ok) => {
-        socket.on(session_topic('connected'), () => ok(send_data))
+        socket.on(session_topic('connected'), () => ok({ send_data, disconnect }))
     })
 
 } 

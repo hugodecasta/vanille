@@ -1,5 +1,5 @@
-export function add_to_elm(source, ...content) {
-    for (let e of content) {
+function set_to_elm(source, content_array, method_str) {
+    for (let e of content_array) {
         if (e == null) continue
         source.components?.push(e)
         if (e.comp_parent) e.comp_parent = source
@@ -11,10 +11,18 @@ export function add_to_elm(source, ...content) {
             inner.innerHTML = e
             e = inner
         }
-        source.appendChild(e)
+        source[method_str](e)
         e.update?.()
     }
     return source
+}
+
+export function add_to_elm(source, ...content) {
+    return set_to_elm(source, content, 'appendChild')
+}
+
+export function pre_to_elm(source, ...content) {
+    return set_to_elm(source, content, 'prepend')
 }
 
 export function bodyAdd(...content) {
@@ -30,6 +38,10 @@ export function decorate_with_setters(elm) {
     }
     elm.add = (...content) => {
         add_to_elm(elm, ...content)
+        return elm
+    }
+    elm.pre = (...content) => {
+        pre_to_elm(elm, ...content)
         return elm
     }
     elm.add2 = (parent) => {

@@ -42,6 +42,8 @@ export class INTER_GAME {
                 root_handler(...data)
             })
 
+            this.goodbye = goodbye
+
             this.buffer = []
             let buffering = true
             setTimeout(() => {
@@ -65,7 +67,7 @@ export class INTER_GAME {
                 }
             }
 
-            this.connected_sender = await connect_session(
+            const { send_data, disconnect } = await connect_session(
                 session_code,
                 (journal_id, packet) => {
                     const { topic, data } = packet
@@ -74,6 +76,8 @@ export class INTER_GAME {
                 (journal) => init.call(this, journal),
                 IS_url
             )
+            this.connected_sender = send_data
+            this.disconnect = disconnect
 
             const welcome_data = await welcome.call(this)
             this.send_data('welcome', welcome_data, 'welcome' + JSON.stringify(welcome_data) + Date.now())
@@ -84,15 +88,13 @@ export class INTER_GAME {
                     e.preventDefault()
                 })
                 window.addEventListener('unload', async (e) => {
-                    const goodbye_data = await goodbye.call(this)
-                    this.send_data('goodbye', goodbye_data, 'goodbye' + JSON.stringify(goodbye_data) + Date.now())
+                    this.leave()
                 })
             }
             else if (typeof (force_close_ask) == 'function') {
                 window.addEventListener('beforeunload', async (e) => {
                     e.preventDefault()
-                    const goodbye_data = await goodbye.call(this)
-                    this.send_data('goodbye', goodbye_data, 'goodbye' + JSON.stringify(goodbye_data) + Date.now())
+                    this.leave()
                     force_close_ask()
                 })
             }
@@ -100,6 +102,12 @@ export class INTER_GAME {
             ok(this)
 
         })
+    }
+
+    async leave() {
+        const goodbye_data = await this.goodbye.call(this)
+        this.send_data('goodbye', goodbye_data, 'goodbye' + JSON.stringify(goodbye_data) + Date.now())
+        setTimeout(() => this.disconnect(), 1000)
     }
 
     on_topic(topic, func) {
