@@ -17,6 +17,7 @@ export class KEYSTATE extends EventHandler {
             if (this.DEBUG) console.log('keydown', evt.code)
             this.current_pressed[evt.key] = true
             this.current_code_pressed[evt.code] = true
+            this.key_code_triggers[evt.code]?.forEach(f => f(evt))
             this.trigger_event('keydown', evt, this.current_pressed)
         })
         window.addEventListener('keyup', (evt) => {
@@ -75,6 +76,12 @@ export class KEYSTATE extends EventHandler {
             this.one_timer[key_code] = true
             return true
         }
+    }
+
+    key_code_triggers = {}
+    on_key_code(key_code, func) {
+        this.key_code_triggers[key_code] ??= []
+        this.key_code_triggers[key_code].push(func)
     }
 
     add_state_caps_text(state_condition, text) {
