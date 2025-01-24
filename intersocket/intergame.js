@@ -92,11 +92,7 @@ export class INTER_GAME {
                 })
             }
             else if (typeof (force_close_ask) == 'function') {
-                window.addEventListener('beforeunload', async (e) => {
-                    e.preventDefault()
-                    this.leave()
-                    force_close_ask()
-                })
+                window.addEventListener('beforeunload', this.before_unload_handler)
             }
 
             ok(this)
@@ -104,9 +100,16 @@ export class INTER_GAME {
         })
     }
 
+    before_unload_handler(e) {
+        e.preventDefault()
+        this.leave()
+        force_close_ask()
+    }
+
     async leave() {
         const goodbye_data = await this.goodbye.call(this)
         this.send_data('goodbye', goodbye_data, 'goodbye' + JSON.stringify(goodbye_data) + Date.now())
+        window.removeEventListener('beforeunload', this.before_unload_handler)
         setTimeout(() => this.disconnect(), 1000)
     }
 

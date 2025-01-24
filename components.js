@@ -423,7 +423,7 @@ function replace_old_func(elm, func_name, func) {
     }
 }
 
-export function input(holder = '', type = 'text', cb = () => { }, use_enter_key = true) {
+export function input(holder = '', type = 'text', cb = () => { }, use_enter_key = true, activate_on_blur = true) {
     const is_checkbox = type.toLocaleLowerCase() == 'checkbox'
     const input = type.toLocaleLowerCase() == 'textarea' ? create_elm('textarea') : create_elm('input')
     input.setAttribute('type', type)
@@ -433,8 +433,10 @@ export function input(holder = '', type = 'text', cb = () => { }, use_enter_key 
     if (type.toLocaleLowerCase() == 'date') {
         change_function_name = 'onblur'
     }
-    input[change_function_name] = () => cb(is_checkbox ? input.checked : input.value)
-    input['onblur'] = () => cb(is_checkbox ? input.checked : input.value)
+    if (activate_on_blur) {
+        input[change_function_name] = () => cb(is_checkbox ? input.checked : input.value)
+        input['onblur'] = () => cb(is_checkbox ? input.checked : input.value)
+    }
 
     input.onkeyup = (evt) => {
         if (evt.key == 'Enter' && use_enter_key) cb(is_checkbox ? input.checked : input.value)
