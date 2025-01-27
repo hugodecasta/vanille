@@ -92,9 +92,9 @@ export class INTER_GAME {
                 })
             }
             else if (typeof (force_close_ask) == 'function') {
-                window.addEventListener('beforeunload', () => {
+                window.addEventListener('beforeunload', async (e) => {
                     e.preventDefault()
-                    this.leave()
+                    await this.leave()
                     force_close_ask()
                 })
             }

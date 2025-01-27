@@ -194,6 +194,12 @@ export function decorate_with_setters(elm) {
         elm.addEventListener(evt_name, func)
         return elm
     }
+    elm.on_enter = (func) => {
+        elm.on('keyup', (e) => {
+            if (e.key == 'Enter') func(e)
+        })
+        return elm
+    }
 
     return elm
 }
