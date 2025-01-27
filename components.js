@@ -331,7 +331,7 @@ export function select_options(list, pre_selected, cb) {
     list = get_list(list)
     const keys = Object.keys(list)
     if (!keys.includes(pre_selected)) {
-        pre_selected = keys[0]
+        pre_selected = Object.values(list)[0]
         cb(pre_selected)
     }
     for (const elm_name in list) {
