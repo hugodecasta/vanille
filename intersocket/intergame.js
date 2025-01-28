@@ -30,6 +30,7 @@ export class INTER_GAME {
         goodbye, on_goodbye,
         init, data_handler,
         force_close_ask = true,
+        appID = null,
         IS_url = 'https://intersocket.hugocastaneda.fr',
     ) {
 
@@ -38,12 +39,12 @@ export class INTER_GAME {
 
         return new Promise(async (ok) => {
 
+            // ------------------------------------------------- defer sys
             this.defere_sys = new DEFER_SYSTEM((data) => {
                 root_handler(...data)
             })
 
-            this.goodbye = goodbye
-
+            // ------------------------------------------------- buffer
             this.buffer = []
             let buffering = true
             setTimeout(() => {
@@ -52,6 +53,7 @@ export class INTER_GAME {
                 this.buffer = []
             }, 3000)
 
+            // ------------------------------------------------- handler
             const root_handler = (topic, data, journal_id) => {
                 this.defere_sys.prepare_defer([topic, data, journal_id])
                 this.buffer.push([topic, data, journal_id])
@@ -67,7 +69,8 @@ export class INTER_GAME {
                 }
             }
 
-            const { send_data, disconnect } = await connect_session(
+            // ------------------------------------------------- source session connect
+            const { send_data, set_expose_data, on_expose_data, disconnect } = await connect_session(
                 session_code,
                 (journal_id, packet) => {
                     const { topic, data } = packet
@@ -76,13 +79,25 @@ export class INTER_GAME {
                 (journal) => init.call(this, journal),
                 IS_url
             )
+
             this.connected_sender = send_data
             this.disconnect = disconnect
 
+            // ------------------------------------------------- exposed data
+            const exposed_data = {}
+            on_expose_data((key, value) => {
+                exposed_data[key] = value
+                root_handler('expose_data', JSON.parse(JSON.stringify(exposed_data)), 'expose_data')
+            })
+            this.data_exposer = set_expose_data
+            if (appID) {
+                this.set_expose_data('appID', appID)
+            }
+
+            // ------------------------------------------------- welcome goodbye
+            this.goodbye = goodbye
             const welcome_data = await welcome.call(this)
             this.send_data('welcome', welcome_data, 'welcome' + JSON.stringify(welcome_data) + Date.now())
-
-
             if (force_close_ask === true) {
                 window.addEventListener('beforeunload', (e) => {
                     e.preventDefault()
@@ -99,6 +114,7 @@ export class INTER_GAME {
                 })
             }
 
+            // ------------------------------------------------- return
             ok(this)
 
         })
@@ -115,6 +131,10 @@ export class INTER_GAME {
         this.on_topicers[topic] ??= []
         this.on_topicers[topic].push(func)
         this.buffer.forEach(b => func(...b))
+    }
+
+    set_expose_data(key, value) {
+        this.data_exposer(key, value)
     }
 
     send_data(topic, data, journal_id = null) {
