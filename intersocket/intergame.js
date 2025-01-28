@@ -95,6 +95,7 @@ export class INTER_GAME {
             }
 
             // ------------------------------------------------- welcome goodbye
+            this.left = false
             this.goodbye = goodbye
             const welcome_data = await welcome.call(this)
             this.send_data('welcome', welcome_data, 'welcome' + JSON.stringify(welcome_data) + Date.now())
@@ -121,6 +122,8 @@ export class INTER_GAME {
     }
 
     async leave() {
+        if (this.left) return
+        this.left = true
         const goodbye_data = await this.goodbye.call(this)
         this.send_data('goodbye', goodbye_data, 'goodbye' + JSON.stringify(goodbye_data) + Date.now())
         // window.removeEventListener('beforeunload', this.before_unload_handler)
