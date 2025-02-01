@@ -29,7 +29,7 @@ export function stop_database_update() {
 }
 
 let stop_saving = false
-window.stop_database_update = stop_database_update
+// window.stop_database_update = stop_database_update
 
 export class DATABASE {
 
