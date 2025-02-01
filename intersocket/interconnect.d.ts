@@ -1,21 +1,20 @@
-type DataHandler = (topic: string, data: any, journal_id: string) => void
-
-export class INTER_GAME {
-
-    constructor(
-        session_code: string,
-        welcome: () => object, on_welcome: (player: object) => void,
-        goodbye: () => object, on_goodbye: (player: object) => void,
-        init: () => void, data_handler: DataHandler,
-        force_close_ask: boolean,
-        appID: number | string,
-        IS_url: string,
-    ): Promise<INTER_GAME>
-
-    leave(): Promise<void>
-    on_topic(topic: string, func: Function): void
-    set_expose_data(key: string, value: string): void
-    send_data(topic: string, data: any, journal_id: string): void
-    defer(): void
-    add_data_handler(data_handler: DataHandler): void
+interface Session_controler {
+    send_data(journal_id: string, data: any): void
+    set_expose_data(key: string, value: string | number): void
+    on_expose_data(f: Function): void
+    disconnect(): void
 }
+
+export function connect_session(
+    session_code: string,
+    on_journal_data: Function, init: Function,
+    IS_url: string | undefined
+): Promise<Session_controler>
+
+interface ExposedSession {
+    session_code: number,
+    members: numbers,
+    data: object
+}
+
+export function get_exposed_sessions(appID: number | string, IS_url: string | undefined): Array<ExposedSession>

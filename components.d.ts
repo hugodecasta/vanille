@@ -4,7 +4,6 @@ interface Position { x: number, y: number }
 
 //#region ------------------------------------------------------------------------------COMPONENTS
 
-
 interface DecoratedNODE extends HTMLElement {
     add_classe(name: string): DecoratedNODE
     add(...content: any): DecoratedNODE
