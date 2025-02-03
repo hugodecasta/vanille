@@ -2,6 +2,8 @@
 
 interface Position { x: number, y: number }
 
+type CSSObject = CSSStyleDeclaration
+
 //#region ------------------------------------------------------------------------------COMPONENTS
 
 interface DecoratedNODE extends HTMLElement {
@@ -11,7 +13,7 @@ interface DecoratedNODE extends HTMLElement {
     add2(parent: DecoratedNODE): DecoratedNODE
     inner_html(str_data: string): DecoratedNODE
     add2b(): DecoratedNODE
-    set_style(style: object): DecoratedNODE
+    set_style(style: CSSObject): DecoratedNODE
     margin(margin_data: object | number | string): DecoratedNODE
     padding(padding_data: object | number | string): DecoratedNODE
     set_attributes(attributes: object): DecoratedNODE

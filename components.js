@@ -33,6 +33,7 @@ export function bodyAdd(...content) {
 
 export function decorate_with_setters(elm) {
     elm.add_classe = (name) => {
+        if (!name) return elm
         name.split(' ').forEach(c => elm.classList.add(c))
         return elm
     }
