@@ -121,7 +121,7 @@ interface Listener {
     trigger(...args: any): void
 }
 
-export function listen_to(variable: Function, action: Function, immediate: boolean, timer: number): Listener
+export function listen_to(variable: Function, action: Function, immediate: boolean, timer: number, im_delay: number): Listener
 export function popup_pop(inside_div: DecoratedNODE, end_action: Function, button_func_maker: Function): Promise<object>
 export function dynadiv(variable_func: Function, draw_func: Function): DecoratedNODE
 export function from_table(array: Array<any>): DecoratedNODE
