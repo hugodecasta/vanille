@@ -83,7 +83,7 @@ export function select_options(list: SelLIST, pre_selected: any, cb: Function): 
 export function selecter(list: SelLIST, cb: Function): DecoratedNODE
 export function selecter_filter(list: SelLIST, selecter_gen_func: Function, cb: Function): DecoratedNODE
 export function multi_selecter(list: SelLIST, pre_selected: Array<string>, cb: Function): DecoratedNODE
-export function input(holder: string, type: string, cb: Function): DecoratedNODE
+export function input(holder: string, type: string, cb: Function, use_enter_key: boolean, activate_on_blur: boolean): DecoratedNODE
 export function asyncInput(holder: string, type: string, set_elm: Function): DecoratedNODE
 
 // ---------------------------------------------- CONTENT BUTTONS
