@@ -17,4 +17,4 @@ interface ExposedSession {
     data: object
 }
 
-export function get_exposed_sessions(appID: number | string, IS_url: string | undefined): Array<ExposedSession>
+export function get_exposed_sessions(appID: number | string, IS_url: string | undefined): Promise<Array<ExposedSession>>
