@@ -64,6 +64,15 @@ export function debounce_maker(func, wait = 1000) {
     }
 }
 
+export function debounce_force_maker(func, wait = 1000) {
+    let timeout
+    return function (...args) {
+        if (timeout) return
+        func(...args)
+        timeout = setTimeout(() => timeout = null, wait)
+    }
+}
+
 export function click_link(link, target) {
     alink(link, target, '').click()
 }
