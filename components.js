@@ -336,8 +336,8 @@ export function get_list(list) {
 export function select_options(list, pre_selected, cb) {
     const select = create_elm('select')
     list = get_list(list)
-    const keys = Object.keys(list)
-    if (!keys.includes(pre_selected)) {
+    const values = Object.values(list)
+    if (!values.includes(pre_selected)) {
         pre_selected = Object.values(list)[0]
         cb(pre_selected)
     }
@@ -435,6 +435,7 @@ export function input(holder = '', type = 'text', cb = () => { }, use_enter_key 
     const input = type.toLocaleLowerCase() == 'textarea' ? create_elm('textarea') : create_elm('input')
     input.setAttribute('type', type)
     input[is_checkbox ? 'checked' : 'value'] = holder
+    console.log('holder', holder)
 
     let change_function_name = 'onchange'
     if (type.toLocaleLowerCase() == 'date') {
@@ -457,6 +458,17 @@ export function input(holder = '', type = 'text', cb = () => { }, use_enter_key 
         setTimeout(caller, 10)
     })
 
+    return input
+}
+
+export function slider(holder = 0, min, max, step, cb = () => { }) {
+    const input = create_elm('input')
+    input.setAttribute('type', 'range')
+    input.setAttribute('min', min)
+    input.setAttribute('max', max)
+    input.setAttribute('step', step)
+    input.value = holder
+    input.onchange = () => cb(input.value)
     return input
 }
 
