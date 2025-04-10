@@ -9,7 +9,7 @@ export function pending_promise() {
     return [ok, reject, prom]
 }
 
-export function set_iter_inter(iterations, timer_per_iteration, func) {
+export function set_iter_inter(iterations, timer_per_iteration, func, immediate) {
     let i = 0
     let interval = setInterval(() => {
         func(i)
@@ -18,5 +18,12 @@ export function set_iter_inter(iterations, timer_per_iteration, func) {
             clearInterval(interval)
         }
     }, timer_per_iteration)
+    if (immediate) {
+        func(i)
+        i++
+        if (i >= iterations) {
+            clearInterval(interval)
+        }
+    }
     return interval
 }

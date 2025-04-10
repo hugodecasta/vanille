@@ -118,6 +118,8 @@ class PADSTATE extends EventHandler {
         'RAxeY': 0,
     }
 
+    pad_available = false
+
     set_axe_threashold(name, threashold) {
         this.axes_threashold[name] = threashold
     }
@@ -136,15 +138,27 @@ class PADSTATE extends EventHandler {
         return this.current_values[key] ?? 0
     }
 
+    confronted = {}
+    confront_one_time(key) {
+        if (!this.current_pressed[key]) this.confronted[key] = false
+        if (this.current_pressed[key] && !this.confronted[key]) {
+            this.confronted[key] = true
+            return true
+        }
+        return false
+    }
+
     constructor() {
         super()
 
         let gamepad_index = null
         window.addEventListener("gamepadconnected", (e) => {
             gamepad_index = e.gamepad.index
+            this.pad_available = true
         })
         window.addEventListener("gamepaddisconnected", (e) => {
             gamepad_index = null
+            this.pad_available = false
         })
 
         setInterval(() => {
@@ -154,6 +168,7 @@ class PADSTATE extends EventHandler {
                 return [btn_name, gamepad.buttons[id].value]
             }))
             const axes = Object.fromEntries(gp_axe_map.map((axe_name, id) => {
+                console.log()
                 return [
                     axe_name,
                     (Math.abs(gamepad.axes[id]) > this.axes_threashold[axe_name] ? gamepad.axes[id] : 0)

@@ -314,8 +314,13 @@ export function card(classes, ...content) {
 }
 
 export function button(name, onclick) {
-    const btn = create_elm('button', '', name)
+    const btn = create_elm('button', '', name).set_attributes({ type: 'button' })
     btn.addEventListener('click', (...args) => onclick(btn, ...args))
+    btn.addEventListener('keydown', (evt) => {
+        if (evt.key === 'Enter' && document.activeElement.tagName === 'BUTTON') {
+            evt.preventDefault()
+        }
+    })
     // btn.onclick = (...args) => onclick(btn, ...args)
     return btn
 }

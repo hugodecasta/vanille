@@ -38,10 +38,11 @@ export class DATABASE {
 
     before_save = undefined
 
-    constructor(name, default_object, force = false) {
+    constructor(name, default_object, force = false, loader = localstorage_loader) {
 
-        this.object = DATABASE.get(name, default_object, true)
+        this.object = DATABASE.get(name, default_object, true, loader)
         this.name = name
+        this.loader = loader
 
         if (force) this.object = default_object
 
@@ -58,7 +59,7 @@ export class DATABASE {
 
     save() {
         this.before_save.forEach(f => f(this.object))
-        DATABASE.set(this.name, this.object, true)
+        DATABASE.set(this.name, this.object, true, this.loader)
     }
 
     onload(object) {
@@ -75,16 +76,15 @@ export class DATABASE {
 
 }
 
-DATABASE.get = function (name, default_object, constant = false) {
-    let str = localStorage.getItem(name)
-    if (!str) str = JSON.stringify(default_object)
-    return resolve_sub_objects_sync(JSON.parse(str), loaded_sub_bases, DATABASE, constant)
+DATABASE.get = function (name, default_object, constant = false, loader = localstorage_loader) {
+    const object = loader.load(name, default_object)
+    return resolve_sub_objects_sync(object, loaded_sub_bases, DATABASE, constant)
 
 }
 
-DATABASE.set = function (name, object, constant = false) {
+DATABASE.set = function (name, object, constant = false, loader = localstorage_loader) {
     const saved_object = check_for_sub_object(object, loaded_sub_bases, DATABASE, constant)
-    localStorage.setItem(name, JSON.stringify(saved_object))
+    loader.save(name, saved_object)
 }
 
 DATABASE.delete_prop = function (root, prop) {
@@ -101,3 +101,25 @@ DATABASE.delete_prop = function (root, prop) {
     }
     delete root[prop]
 }
+
+export class DB_LOADER {
+    constructor(save_func, load_func) {
+        this.save_func = save_func
+        this.load_func = load_func
+    }
+    save(name, obj) {
+        this.save_func(name, obj)
+    }
+    load(name) {
+        return this.load_func(name)
+    }
+}
+
+const localstorage_loader = new DB_LOADER(
+    (name, obj) => {
+        localStorage.setItem(name, JSON.stringify(obj))
+    },
+    (name, default_object) => {
+        return JSON.parse(localStorage.getItem(name)) ?? default_object
+    }
+)
