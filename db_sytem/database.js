@@ -110,8 +110,8 @@ export class DB_LOADER {
     save(name, obj) {
         this.save_func(name, obj)
     }
-    load(name) {
-        return this.load_func(name)
+    load(name, default_object) {
+        return this.load_func(name, default_object)
     }
 }
 

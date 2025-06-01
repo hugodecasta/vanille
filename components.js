@@ -853,11 +853,14 @@ export function make_file_drop_div(div, url, cb, multiple = false, on_drag_enter
     async function uploadFile(file) {
         const formData = new FormData()
         formData.append('file', file)
-        if (typeof url != 'function') url = () => url
-        const data = await (await fetch(url(file), {
-            method: 'POST',
-            body: formData
-        })).json()
+        if (typeof url != 'function') {
+            const fixed_url = url
+            url = (formData) => fetch(fixed_url, {
+                method: 'POST',
+                body: formData
+            })
+        }
+        const data = await (await url(formData)).json()
         cb(data, div)
     }
 

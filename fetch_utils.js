@@ -73,8 +73,10 @@ export function debounce_force_maker(func, wait = 1000) {
     }
 }
 
-export function click_link(link, target) {
-    alink(link, target, '').click()
+export function click_link(link, target, post_func = () => null) {
+    const link_elm = alink(link, target, '')
+    post_func(link_elm)
+    link_elm.click()
 }
 
 export function download_file(filename, content) {
