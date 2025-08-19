@@ -73,6 +73,8 @@ export function p(...content: any): DecoratedNODE
 export function h1(...title: any): DecoratedNODE
 export function h2(...title: any): DecoratedNODE
 export function h3(...title: any): DecoratedNODE
+export function ul(...content: any): DecoratedNODE
+export function li(...content: any): DecoratedNODE
 export function hr(): DecoratedNODE
 export function br(): DecoratedNODE
 export function card(classes: string, ...content: any): DecoratedNODE

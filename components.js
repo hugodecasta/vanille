@@ -301,6 +301,14 @@ export function h3(...title) {
     return create_elm('h3', '', ...title)
 }
 
+export function ul(...content) {
+    return create_elm('ul', '', ...content)
+}
+
+export function li(...content) {
+    return create_elm('li', '', ...content)
+}
+
 export function hr() {
     return create_elm('hr')
 }
