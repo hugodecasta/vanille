@@ -448,7 +448,6 @@ export function input(holder = '', type = 'text', cb = () => { }, use_enter_key 
     const input = type.toLocaleLowerCase() == 'textarea' ? create_elm('textarea') : create_elm('input')
     input.setAttribute('type', type)
     input[is_checkbox ? 'checked' : 'value'] = holder
-    console.log('holder', holder)
 
     let change_function_name = 'onchange'
     if (type.toLocaleLowerCase() == 'date') {
