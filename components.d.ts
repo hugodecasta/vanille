@@ -22,6 +22,7 @@ interface DecoratedNODE extends HTMLElement {
     update(...args: any): void
     update_on(variable: Function): DecoratedNODE
     set_updater(updater: Function): DecoratedNODE
+    set_listen(variable: Function, updater: Function): DecoratedNODE
     remove_last_updater(): DecoratedNODE
     set_on_remove(remover: Function): DecoratedNODE
     remove(): void

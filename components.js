@@ -121,6 +121,7 @@ export function decorate_with_setters(elm) {
     elm.update_on = (variable) => {
         listen_to(variable, [elm.update])
         elm.update()
+        return elm
     }
     elm.set_updater = (updater) => {
         elm.updaters.push(updater)
@@ -130,6 +131,11 @@ export function decorate_with_setters(elm) {
         elm.updaters.splice(elm.updaters.length - 1, 1)
     }
 
+    elm.set_listen = (variable, action) => {
+        elm.set_updater(function () { action(this, variable()) })
+        elm.update_on(variable)
+        return elm
+    }
 
     elm.removers = []
     elm.set_on_remove = (remover) => {
@@ -147,7 +153,12 @@ export function decorate_with_setters(elm) {
     }
 
     elm.set_click = (func) => {
-        elm.addEventListener('click', func)
+        let was_down = false
+        elm.addEventListener('mousedown', (e) => was_down = true)
+        elm.addEventListener('mouseup', (e) => {
+            if (was_down) func(e)
+            was_down = false
+        })
         return elm
     }
 
