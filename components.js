@@ -834,6 +834,7 @@ export function file_drop_div(url, cb, multiple = false, on_drag_enter = null, i
 export function make_file_drop_div(div, url, cb, multiple = false, on_drag_enter = null, in_drag_leave = null, on_drop = null) {
 
     div.set_style({ cursor: 'pointer' })
+    div.set_attributes({ role: 'button', tabindex: '0' })
 
     function preventDefaults(e) {
         e.preventDefault()
@@ -857,8 +858,7 @@ export function make_file_drop_div(div, url, cb, multiple = false, on_drag_enter
     }, false)
 
 
-    div.addEventListener('click', (evt) => {
-        if (evt.target != div) return
+    function open_file_picker() {
         const fileInput = input('', 'file', () => { }).add2b().hide().set_attributes({ multiple: multiple })
         fileInput.addEventListener('change', (e) => {
             const files = e.target.files;
@@ -866,6 +866,17 @@ export function make_file_drop_div(div, url, cb, multiple = false, on_drag_enter
             fileInput.remove()
         }, false)
         fileInput.click()
+    }
+
+    div.addEventListener('click', () => {
+        open_file_picker()
+    })
+
+    div.addEventListener('keydown', (evt) => {
+        if (evt.key === 'Enter' || evt.key === ' ') {
+            evt.preventDefault()
+            open_file_picker()
+        }
     })
 
     async function uploadFile(file) {
