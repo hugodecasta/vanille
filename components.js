@@ -851,7 +851,8 @@ export function make_file_drop_div(div, url, cb, multiple = false, on_drag_enter
     div.addEventListener('drop', (e) => {
         const dt = e.dataTransfer
         const files = dt.files
-        on_drop?.(div, files)
+        const handled = on_drop?.(div, files)
+        if (handled === true) return
         for (const file of files) {
             uploadFile(file)
         }
@@ -861,8 +862,10 @@ export function make_file_drop_div(div, url, cb, multiple = false, on_drag_enter
     function open_file_picker() {
         const fileInput = input('', 'file', () => { }).add2b().hide().set_attributes({ multiple: multiple })
         fileInput.addEventListener('change', (e) => {
-            const files = e.target.files;
-            ([...files]).forEach(uploadFile)
+            const files = e.target.files
+            const handled = on_drop?.(div, files)
+            if (handled === true) { fileInput.remove(); return }
+            ; ([...files]).forEach(uploadFile)
             fileInput.remove()
         }, false)
         fileInput.click()
