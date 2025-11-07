@@ -81,6 +81,10 @@ export function click_link(link, target, post_func = () => null) {
 
 export function download_file(filename, content) {
     const blob = new Blob([content], { type: 'text/plain' })
+    download_blob_file(filename, blob)
+}
+
+export function download_blob_file(filename, blob) {
     const link = document.createElement('a')
     link.href = URL.createObjectURL(blob)
     link.download = filename

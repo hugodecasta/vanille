@@ -12,3 +12,4 @@ export function debounce_force_maker(func: Function, wait: number): void
 
 export function click_link(link: string, target: string, post_func: Function): void
 export function download_file(filename: string, content: string): void
+export function download_blob_file(filename: string, blob: Blob): void
