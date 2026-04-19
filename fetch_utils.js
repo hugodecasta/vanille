@@ -22,13 +22,16 @@ export async function get_text(ep, op) {
 }
 
 export async function post_json(ep, json_data, op = {}) {
+    const headers = {
+        'Content-Type': 'application/json',
+        ...(op.headers || {}),
+    }
+
     return await (await fetch(ep, {
+        ...op,
         method: 'post',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers,
         body: JSON.stringify(json_data),
-        ...op
     })).json()
 }
 
