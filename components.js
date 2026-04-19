@@ -831,7 +831,7 @@ export function file_drop_div(url, cb, multiple = false, on_drag_enter = null, i
     return make_file_drop_div(div(), url, cb, multiple, on_drag_enter, in_drag_leave, on_drop)
 }
 
-export function make_file_drop_div(div, url, cb, multiple = false, on_drag_enter = null, in_drag_leave = null, on_drop = null) {
+export function make_file_drop_div(div, url, cb, multiple = false, on_drag_enter = null, in_drag_leave = null, on_drop = null, options = {}) {
 
     div.set_style({ cursor: 'pointer' })
     div.set_attributes({ role: 'button', tabindex: '0' })
@@ -889,7 +889,8 @@ export function make_file_drop_div(div, url, cb, multiple = false, on_drag_enter
             const fixed_url = url
             url = (formData) => fetch(fixed_url, {
                 method: 'POST',
-                body: formData
+                body: formData,
+                ...options
             })
         }
         const data = await (await url(formData)).json()

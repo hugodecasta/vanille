@@ -140,7 +140,8 @@ export function make_file_drop_div(
     url: string,
     cb: Function,
     multiple: boolean,
-    on_drag_enter: Function, in_drag_leave: Function, on_drop: Function
+    on_drag_enter: Function, in_drag_leave: Function, on_drop: Function,
+    options: RequestInit
 ): DecoratedNODE
 export function jsoncopy(json: object): object
 export function invert_json(json: object): object
