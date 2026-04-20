@@ -2,11 +2,15 @@ import { alink, jsoncopy } from "./components.js"
 
 const cached = {}
 
-export async function get_json(ep, op) {
+export async function get_json(ep, op, throw_on_error = false) {
     if (cached[ep] && cached[ep].data) {
         return cached[ep].data
     }
-    return await (await fetch(ep, op)).json()
+    const response = await fetch(ep, op)
+    if (!response.ok && throw_on_error) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    return await response.json()
 }
 
 export function set_cached_json(ep, op) {

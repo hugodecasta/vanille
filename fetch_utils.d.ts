@@ -1,4 +1,4 @@
-export function get_json(ep: string, op: RequestInit): Promise<JSON>
+export function get_json(ep: string, op: RequestInit, throw_on_error: boolean): Promise<JSON>
 export function set_cached_json(ep: string, op: RequestInit): void
 export function get_text(ep: string, op: RequestInit): Promise<string>
 export function post_json(ep: string, json_data: object, op: RequestInit): Promise<JSON>
